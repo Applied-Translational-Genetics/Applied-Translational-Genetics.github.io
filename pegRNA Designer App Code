@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head lang="en">
+  <meta charset="UTF-8">
+  <title>pegRNA Designer</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Changa:wght@200&family=Source+Sans+Pro&display=swap" rel="stylesheet">
+  <style>
+    body {
+      padding:0;
+      margin:0;
+    }
+    .Top{
+      padding-top: 1px;
+      padding-left: 10px;
+      padding-right: 10px;
+      background-color: #fdcfdf;
+      font-family: 'Changa', sans-serif;
+    }
+    .top_line{
+      border-top: dashed;
+    }
+    .Bottom{
+      margin:1%;
+      font-family: 'Source Sans Pro', sans-serif;
+    }
+  </style>
+  <script language="JavaScript">
+    function DisplaypegRNA() {
+      var wt_sequence = document.getElementById("wt_sequence").value;
+      var edit_sequence = document.getElementById("edit_sequence").value;
+      var rt_length_string = document.getElementById("rt_length").value;
+      var rt_length = parseInt(rt_length_string, 10) + 27; //Positions the RT template relative to the nick site
+      function reverseString(str) {
+        return str.split("").reverse().join("");
+      } //Function to reverse the PBS and RT template sequence
+      var wt_alt_strand = wt_sequence.replace(/A/g, "Z").replace(/C/g, "X").replace(/G/g, "Y").replace(/T/g, "O").replace(/Z/g, "T").replace(/X/g, "G").replace(/Y/g, "C").replace(/O/g, "A"); //Converts sequence to it's complement
+      var edit_alt_strand = edit_sequence.replace(/A/g, "Z").replace(/C/g, "X").replace(/G/g, "Y").replace(/T/g, "O").replace(/Z/g, "T").replace(/X/g, "G").replace(/Y/g, "C").replace(/O/g, "A"); //Converts sequence to it's complement
+      var grna = wt_sequence.slice(10,30); // Generates the spacer sequence
+      var pbs_10_alt = wt_alt_strand.slice(17,27); // Generates the PBS sequences
+      var pbs_13_alt = wt_alt_strand.slice(14,27);
+      var pbs_16_alt = wt_alt_strand.slice(11,27);
+      var rt_alt = edit_alt_strand.slice(27, rt_length); // Generates the RT template based on the required length
+      var pbs_10 = reverseString(pbs_10_alt); // Reverses the PBSs
+      var pbs_13 = reverseString(pbs_13_alt);
+      var pbs_16 = reverseString(pbs_16_alt);
+      var rt = reverseString(rt_alt); //Reverses the RT template
+      var scaffold = "GTTTTAGAGCTAGAAATAGCAAGTTAAAATAAGGCTAGTCCGTTATCAACTTGAAAAAGTGGCACCGAGTCGGTGC"
+      var peg_pbs_10 = grna + scaffold + rt + pbs_10; // Pulls together the complete pegRNA sequences using the most commonly utilised gRNA scaffold sequence from the original prime editing paper
+      var peg_pbs_13 = grna + scaffold + rt + pbs_13;
+      var peg_pbs_16 = grna + scaffold + rt + pbs_16;
+        document.getElementById('peg_pbs_10').innerHTML =
+                    "Primer Binding Sequence 10nt: " + peg_pbs_10;
+        document.getElementById('peg_pbs_13').innerHTML =
+                    "Primer Binding Sequence 13nt: " + peg_pbs_13;
+        document.getElementById('peg_pbs_16').innerHTML =
+                    "Primer Binding Sequence 16nt: " + peg_pbs_16;
+        document.getElementById('grna').innerHTML =
+                    "Spacer section: " + grna;
+        document.getElementById('scaffold').innerHTML =
+                    "Scaffold section: " + scaffold;
+        document.getElementById('rt').innerHTML =
+                    "Reverse Transcriptase Template: " + rt;
+        document.getElementById('pbs_10').innerHTML =
+                    "10nt Primer Binding Site: " + pbs_10;
+        document.getElementById('pbs_13').innerHTML =
+                    "13nt Primer Binding Site: " + pbs_13;
+        document.getElementById('pbs_16').innerHTML =
+                    "16nt Primer Binding Site: " + pbs_16;
+        document.getElementById('warning').innerHTML =
+                    "Secondary structure warning status: " + warning;
+    }
+  </script>
+  </head>
+  <body>
+    <div class="Top">
+      <h1>pegRNA Designer</h1>
+      <h3>Automated design of prime editing gRNA</h3>
+      <hr class="top_line">
+    </div>
+    <div class="Bottom">
+      <p>
+        By default this tool will generate 3 pegRNA sequences of varying primer binding sequence (PBS) length - suitable for optimising pegRNA design for maximum editing efficiency. <br/>
+        Provide both the wild type and edited sequence with precisely 30nt flanking the desired PAM site - note editing can only be achieved upstream of the nick induced 3 nucleotides downstream of the PAM site.
+      </p>
+      <form>
+        <label>Reference Sequence</label> <br/>
+        <textarea name="wt_sequence" rows="3" cols="80" autocomplete="off" placeholder="Ensure 30 nucleotides flank either side of the targeted PAM site." required id="wt_sequence"></textarea> <br/> <!-- Genomic reference sequence input box -->
+        <label>Edited Sequence</label> <br/>
+        <textarea name="edit_sequence" rows="3" cols="80" autocomplete="off" placeholder="Ensure all edits are upstream of the nick site." required id="edit_sequence"></textarea> <br/> <!-- Desired edit input box -->
+        <label>Desired length of the Reverse Transcriptase template sequence</label> <br/>
+        <textarea name="rt_length" rows="2" cols="5" autocomplete="off" required id="rt_length"></textarea> <br/> <!-- Desired edit input box -->
+      </form>
+      <input type="submit" onclick="DisplaypegRNA();"><br/>
+      <br/>
+      <br/>
+      <hr class="bottom_line">
+      <p><b>pegRNA Designs:</b></p>
+      <p><span id='peg_pbs_10'></span></p>
+      <p><span id='peg_pbs_13'></span></p>
+      <p><span id='peg_pbs_16'></span></p>
+      <p><b>Design breakdown:</b></p>
+      <p><span id='grna'></span></p>
+      <p><span id='scaffold'></span></p>
+      <p><span id='rt'></span></p>
+      <p><span id='pbs_10'></span></p>
+      <p><span id='pbs_13'></span></p>
+      <p><span id='pbs_16'></span></p>
+      <hr class="bottom_line">
+      <p>
+        For more information on prime editing, refer to 'Search-and-replace genome editing without double-strand breaks or donor DNA' Nature (2019)<br/>
+        This tool follows the pegRNA design recommendations outlined by Payton Randolph and the Liu Group in their Prime Editing Guide RNA Design Documentation which can be found <a href="https://drive.google.com/file/d/1xHWhscwIsyxUUdyGO-BZ8kleYUVmpBJA/view" target="_blank" >here</a> <br/>
+        If intending to employ the U6 promoter, ensure the pegRNA sequence begins with a G and contains no runs of 4 or more Ts besides those present within the gRNA scaffold. <br/>
+        <br/>
+        © 2021 Bradley Hosking
+      </p>
+    </div>
+  </body>
+</html>
